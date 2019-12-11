@@ -108,7 +108,10 @@ sub build ($self) {
             #
             # No more than $nr_of_stars in a row
             #
-            $subject .= "[" . ("*" x $nr_of_stars) . "]";
+            $subject .=   "[" . ("*" x $nr_of_stars) . "]";
+            $pattern .= "\\[" . join ("" => map {gref ($x, $_)} 0 .. $y)
+                              . "\\*{0,$nr_of_stars}" . "\\]";
+
         }
     }
 
