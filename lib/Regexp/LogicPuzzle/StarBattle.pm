@@ -81,9 +81,9 @@ sub build ($self) {
             #
             # Star or not?
             #
-            $subject .= "*;";
+            $subject .= ";*";
             my $name  = cell $x, $y;
-            $pattern .= "(?<$name>[*]?)[*]?;";
+            $pattern .= ";(?<$name>[*]?)[*]?";
         
             #
             # Add condition(s) that the 'current' cell is either
