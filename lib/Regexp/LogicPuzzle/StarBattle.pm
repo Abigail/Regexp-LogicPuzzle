@@ -23,6 +23,8 @@ sub new  ($class) {bless \do {my $var} => $class}
 
 sub init ($self) {
     $nr_of_stars {$self} = 1;
+    $subject     {$self} = "";
+    $pattern     {$self} = "";
     $self;
 }
 
@@ -70,21 +72,48 @@ my sub gref ($x, $y) {
     "\\g{" . cell ($x, $y) . "}";
 }
 
+
+sub __add_to_subject ($self, $text) {
+    $subject {$self} .= $text;
+}
+
+sub __add_to_pattern ($self, $text) {
+    $pattern {$self} .= $text;
+}
+
+
+sub __add_constraint ($self, $sub_subject, $sub_pattern, %args) {
+    my $open  = $args {open}  // "<";
+    my $close = $args {close} // ">";
+    $self -> __add_to_subject ("$open$sub_subject$close");
+    $self -> __add_to_pattern ("$open$sub_pattern$close");
+
+    $self;
+}
+
+
+
 sub build ($self) {
-    my $subject = "";
-    my $pattern = "";
-    my $nr_of_stars = $nr_of_stars {$self};
+    my $subject          = "";
+    my $pattern          = "";
+    my $nr_of_stars      = $nr_of_stars {$self};
+    my $full_stars       = "*"  x $nr_of_stars;
+    my $up_to_full_stars = "\\*{0,$nr_of_stars}";
+
     my $X = $self -> X;
     my $Y = $self -> Y;
+
     for (my $x = 0; $x < $X; $x ++) {
         for (my $y = 0; $y < $Y; $y ++) {
             #
             # Star or not?
             #
-            $subject .= ";*";
             my $name  = cell $x, $y;
-            $pattern .= ";(?<$name>[*]?)[*]?";
-        
+
+            $self -> __add_constraint ("*", "(?<$name>[*]?)[*]?",
+                                       open  => ";",
+                                       close => "");
+
             #
             # Add condition(s) that the 'current' cell is either
             # empty, or all its previous neighbours are empty.
@@ -101,49 +130,51 @@ sub build ($self) {
                     push @neighbours => [$x, $y - 1];
                 }
 
-                $subject .= "<>";
-                $pattern .= "<(?:" . gref ($x, $y) . "|" .
-                            join ("" => map {gref @$_} @neighbours) .
-                            ")>";
+                $self -> __add_constraint (
+                         "",
+                         "(?:" . gref ($x, $y) . "|" .
+                                 join ("" => map {gref @$_} @neighbours) . ")"
+                );
             }
 
             #
             # No more than $nr_of_stars in a row
             #
-            $subject .= "<" . ("*" x $nr_of_stars) . ">";
-            $pattern .= "<" . join ("" => map {gref ($x, $_)} 0 .. $y)
-                              . "\\*{0,$nr_of_stars}" . ">";
+            $self -> __add_constraint (
+                $full_stars,
+                join ("" => map {gref ($x, $_)} 0 .. $y) . $up_to_full_stars,
+            );
 
             #
             # No more than $nr_of_stars in a column
             #
-            $subject .= "<" . ("*" x $nr_of_stars) . ">";
-            $pattern .= "<" . join ("" => map {gref ($_, $y)} 0 .. $x)
-                              . "\\*{0,$nr_of_stars}" . ">";
-
+            $self -> __add_constraint (
+                $full_stars,
+                join ("" => map {gref ($_, $y)} 0 .. $x) . $up_to_full_stars,
+            );
 
             #
             # Constraint for the right number of stars in a row
             #
             if ($y == $Y - 1) {
-                $subject .= "<" . ("*" x $nr_of_stars) . ">";
-                $pattern .= "<" . join ("" => map {gref ($x, $_)} 0 .. $Y - 1) .
-                            ">";
+                $self -> __add_constraint (
+                    $full_stars,
+                    join ("" => map {gref ($x, $_)} 0 .. $Y - 1),
+                );
             }
 
             #
             # Constraint for the right number of stars in a column
             #
             if ($x == $X - 1) {
-                $subject .= "<" . ("*" x $nr_of_stars) . ">";
-                $pattern .= "<" . join ("" => map {gref ($_, $y)} 0 .. $X - 1) .
-                            ">";
+                $self -> __add_constraint (
+                    $full_stars,
+                    join ("" => map {gref ($_, $y)} 0 .. $X - 1),
+                );
             }
+
         }
     }
-
-    $subject {$self} = $subject;
-    $pattern {$self} = $pattern;
 
     $self;
 }
