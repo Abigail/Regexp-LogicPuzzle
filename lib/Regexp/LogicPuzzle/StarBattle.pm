@@ -122,6 +122,14 @@ sub build ($self) {
                               . "\\*{0,$nr_of_stars}" . ">";
 
 
+            #
+            # Constraint for the right number of stars in a row
+            #
+            if ($y == $Y - 1) {
+                $subject .= "<" . ("*" x $nr_of_stars) . ">";
+                $pattern .= "<" . join ("" => map {gref ($x, $_)} 0 .. $Y - 1) .
+                            ">";
+            }
         }
     }
 
