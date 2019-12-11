@@ -92,16 +92,16 @@ sub build ($self) {
                 if ($x > 0) {
                     for my $z ($y - 1 .. $y + 1) {
                         next if $z < 0 || $z >= $Y {$self};
-                        push @neighbours => cell $x - 1, $z;
+                        push @neighbours => [$x - 1, $z];
                     }
                 }
                 if ($y > 0) {
-                    push @neighbours => cell $x, $y - 1;
+                    push @neighbours => [$x, $y - 1];
                 }
 
                 $subject .= "[]";
                 $pattern .= "\\[(?:" . gref ($x, $y) . "|" .
-                            join ("" => map {"\\g{$_}"} @neighbours) .
+                            join ("" => map {gref @$_} @neighbours) .
                             ")\\]";
             }
 
