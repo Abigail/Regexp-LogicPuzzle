@@ -66,6 +66,9 @@ sub set_nr_of_stars ($self, $stars) {
 my sub cell ($x, $y) {
     "cell_${x}_${y}";
 }
+my sub gref ($x, $y) {
+    "\\g{" . cell ($x, $y) . "}";
+}
 
 sub build ($self) {
     my $subject = "";
@@ -97,7 +100,7 @@ sub build ($self) {
                 }
 
                 $subject .= "[]";
-                $pattern .= "\\[(?:\\g{" . cell ($x, $y) . "}|"      .
+                $pattern .= "\\[(?:" . gref ($x, $y) . "|" .
                             join ("" => map {"\\g{$_}"} @neighbours) .
                             ")\\]";
             }
