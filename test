@@ -1,0 +1,63 @@
+#!/opt/perl/bin/perl
+
+use 5.028;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+
+use experimental 'signatures';
+use experimental 'lexical_subs';
+
+use lib 'lib';
+
+use Regexp::LogicPuzzle::StarBattle;
+
+sub run_test ($houses, $nr_of_stars = 1) {
+    my $obj = Regexp::LogicPuzzle::StarBattle:: -> new -> init;
+
+    $obj -> set_nr_of_stars ($nr_of_stars)
+         -> set_houses ($houses);
+
+    $obj -> build;
+
+    my $subject = $obj -> subject;
+    my $pattern = $obj -> pattern;
+
+    # say $subject;
+    # say $pattern;
+
+    $subject =~ $pattern or die "No match";
+
+    my $size = length ((split /\n/ => $houses) [0]);
+
+    for (my $x = 0; $x < $size; $x ++) {
+        for (my $y = 0; $y < $size; $y ++) {
+            print $+ {"cell_${x}_${y}"} || ".";
+        }
+        print "\n";
+    }
+    say "";
+}
+
+
+run_test <<~ '--', 1;
+    AAAAB
+    AAAAB
+    ACCCB
+    DCCBB
+    DDDEE
+    --
+
+run_test <<~ '--', 2;
+    AAAAAAAAAA
+    AABAAAAACA
+    DABAAACCCA
+    DABEEECCCA
+    DAAEEEECCF
+    DAAGEEFFFF
+    HHAGEEEEFF
+    HHHGEEEEIF
+    HHHEEJJEII
+    HHHHEJJJII
+    --
