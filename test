@@ -29,10 +29,8 @@ sub run_test ($houses, $nr_of_stars = 1) {
 
     $subject =~ $pattern or die "No match";
 
-    my $size = length ((split /\n/ => $houses) [0]);
-
-    for (my $x = 0; $x < $size; $x ++) {
-        for (my $y = 0; $y < $size; $y ++) {
+    for (my $x = 0; $x < $obj -> X; $x ++) {
+        for (my $y = 0; $y < $obj -> Y; $y ++) {
             print $+ {"cell_${x}_${y}"} || ".";
         }
         print "\n";

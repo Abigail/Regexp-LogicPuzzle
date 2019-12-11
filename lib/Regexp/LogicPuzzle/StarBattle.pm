@@ -74,8 +74,8 @@ sub build ($self) {
     my $subject = "";
     my $pattern = "";
     my $nr_of_stars = $nr_of_stars {$self};
-    for (my $x = 0; $x < $X {$self}; $x ++) {
-        for (my $y = 0; $y < $Y {$self}; $y ++) {
+    for (my $x = 0; $x < $self -> X; $x ++) {
+        for (my $y = 0; $y < $self -> Y; $y ++) {
             #
             # Star or not?
             #
@@ -99,18 +99,26 @@ sub build ($self) {
                     push @neighbours => [$x, $y - 1];
                 }
 
-                $subject .= "[]";
-                $pattern .= "\\[(?:" . gref ($x, $y) . "|" .
+                $subject .= "<>";
+                $pattern .= "<(?:" . gref ($x, $y) . "|" .
                             join ("" => map {gref @$_} @neighbours) .
-                            ")\\]";
+                            ")>";
             }
 
             #
             # No more than $nr_of_stars in a row
             #
-            $subject .=   "[" . ("*" x $nr_of_stars) . "]";
-            $pattern .= "\\[" . join ("" => map {gref ($x, $_)} 0 .. $y)
-                              . "\\*{0,$nr_of_stars}" . "\\]";
+            $subject .= "<" . ("*" x $nr_of_stars) . ">";
+            $pattern .= "<" . join ("" => map {gref ($x, $_)} 0 .. $y)
+                              . "\\*{0,$nr_of_stars}" . ">";
+
+            #
+            # No more than $nr_of_stars in a column
+            #
+            $subject .= "<" . ("*" x $nr_of_stars) . ">";
+            $pattern .= "<" . join ("" => map {gref ($_, $y)} 0 .. $x)
+                              . "\\*{0,$nr_of_stars}" . ">";
+
 
         }
     }
@@ -123,7 +131,10 @@ sub build ($self) {
 
 
 sub subject ($self) {$subject {$self}}
-sub pattern ($self) {$pattern {$self}};
+sub pattern ($self) {$pattern {$self}}
+
+sub X       ($self) {$X       {$self}}
+sub Y       ($self) {$Y       {$self}}
 
 
 1;
