@@ -74,8 +74,10 @@ sub build ($self) {
     my $subject = "";
     my $pattern = "";
     my $nr_of_stars = $nr_of_stars {$self};
-    for (my $x = 0; $x < $self -> X; $x ++) {
-        for (my $y = 0; $y < $self -> Y; $y ++) {
+    my $X = $self -> X;
+    my $Y = $self -> Y;
+    for (my $x = 0; $x < $X; $x ++) {
+        for (my $y = 0; $y < $Y; $y ++) {
             #
             # Star or not?
             #
