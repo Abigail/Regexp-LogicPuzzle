@@ -130,6 +130,15 @@ sub build ($self) {
                 $pattern .= "<" . join ("" => map {gref ($x, $_)} 0 .. $Y - 1) .
                             ">";
             }
+
+            #
+            # Constraint for the right number of stars in a column
+            #
+            if ($x == $X - 1) {
+                $subject .= "<" . ("*" x $nr_of_stars) . ">";
+                $pattern .= "<" . join ("" => map {gref ($_, $y)} 0 .. $X - 1) .
+                            ">";
+            }
         }
     }
 
