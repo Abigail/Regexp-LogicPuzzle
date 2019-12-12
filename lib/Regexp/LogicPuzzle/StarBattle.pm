@@ -135,6 +135,29 @@ sub __add_line_constraints ($self, $x, $y) {
 }
 
 
+sub __add_house_constraint ($self, $x, $y) {
+    my $nr_of_stars             = $nr_of_stars {$self};
+    my ($house_name, $position) = @{$in_house {$self} [$x] [$y]};
+    my  $house                  = $houses {$self} {$house_name};
+
+    #
+    # Calculate the minimum and maximum number of stars we can
+    # have seen in the current house so far.
+    #
+    my $min_stars          = max (0, $nr_of_stars - @$house + $position + 1);
+    my $max_stars          = min ($position + 1, $nr_of_stars);
+    my $diff_stars         = $max_stars - $min_stars;
+
+    $self -> __add_constraint (
+        "*" x $max_stars,
+        join ("" => map {gref (@$_)} @{$house} [0 .. $position]) .
+                                                 "\\*{0,$diff_stars}",
+    );
+
+    $self;
+}
+
+
 sub build ($self) {
     my $subject          = "";
     my $pattern          = "";
@@ -183,6 +206,8 @@ sub build ($self) {
             # to the left/above the current cell.
             #
             $self -> __add_line_constraints ($x, $y);
+
+            $self -> __add_house_constraint ($x, $y);
         }
     }
 
