@@ -24,10 +24,10 @@ sub run_test ($houses, $nr_of_stars = 1) {
     my $subject = $obj -> subject;
     my $pattern = $obj -> pattern;
 
-    # say $subject;
-    # say $pattern;
+#   say $subject =~ s/;/\n;/gr;
+#   say $pattern =~ s/;/\n;/gr;
 
-    $subject =~ $pattern or die "No match";
+    $subject =~ /$pattern/x or die "No match";
 
     for (my $x = 0; $x < $obj -> X; $x ++) {
         for (my $y = 0; $y < $obj -> Y; $y ++) {
@@ -47,7 +47,7 @@ run_test <<~ '--', 1;
     DDDEE
     --
 
-run_test <<~ '--', 2;
+run_test <<~ '--', 2 if 1;
     AAAAAAAAAA
     AABAAAAACA
     DABAAACCCA
