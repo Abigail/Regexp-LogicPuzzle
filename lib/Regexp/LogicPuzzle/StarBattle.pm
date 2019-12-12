@@ -163,7 +163,6 @@ sub build ($self) {
     my $pattern          = "";
     my $nr_of_stars      = $nr_of_stars {$self};
     my $full_stars       = "*"  x $nr_of_stars;
-    my $up_to_full_stars = "\\*{0,$nr_of_stars}";
 
     my $X = $self -> X;
     my $Y = $self -> Y;
