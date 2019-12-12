@@ -11,6 +11,7 @@ use experimental 'lexical_subs';
 our $VERSION = '2019112901';
 
 use Hash::Util::FieldHash qw [fieldhash];
+use List::Util            qw [min max];
 
 fieldhash my %subject;
 fieldhash my %pattern;
@@ -92,6 +93,41 @@ sub __add_constraint ($self, $sub_subject, $sub_pattern, %args) {
 }
 
 
+#
+# Constraint for the minimum and maximum number of stars in a row,
+# up to the given point. The maximum number of stars in a row (or column)
+# up to a point with index k is 1 + int (k / 2), or $nr_of_stars, taking
+# the minimum value of the two. The minimum number of stars in a row
+# (or column) up to a point with index k is $nr_of_starts - int ((K - k) / 2),
+# or 0, which ever is the maximum value of the two. Here K is the length
+# of the row or column.
+#
+sub __add_line_constraints ($self, $x, $y) {
+    my $X            = $self -> X;
+    my $Y            = $self -> Y;
+    my $nr_of_stars  = $nr_of_stars {$self};
+
+    my $min_y_stars  = max (0, $nr_of_stars - int (($Y - $y) / 2));
+    my $max_y_stars  = min (1 + int ($y / 2), $nr_of_stars);
+    my $diff_y_stars = $max_y_stars - $min_y_stars;
+
+    my $min_x_stars  = max (0, $nr_of_stars - int (($X - $x) / 2));
+    my $max_x_stars  = min (1 + int ($x / 2), $nr_of_stars);
+    my $diff_x_stars = $max_x_stars - $min_x_stars;
+
+    $self -> __add_constraint (
+        "*" x $max_y_stars,
+        join ("" => map {gref ($x, $_)} 0 .. $y) . "\\*{0,$diff_y_stars}",
+    );
+
+    $self -> __add_constraint (
+        "*" x $max_x_stars,
+        join ("" => map {gref ($_, $y)} 0 .. $x) . "\\*{0,$diff_x_stars}",
+    );
+
+    $self;
+}
+
 
 sub build ($self) {
     my $subject          = "";
@@ -109,7 +145,6 @@ sub build ($self) {
             # Star or not?
             #
             my $name  = cell $x, $y;
-
             $self -> __add_constraint ("*", "(?<$name>[*]?)[*]?",
                                        open  => ";",
                                        close => "");
@@ -138,41 +173,10 @@ sub build ($self) {
             }
 
             #
-            # No more than $nr_of_stars in a row
+            # Constraints for the minimum/maximum number of stars 
+            # to the left/above the current cell.
             #
-            $self -> __add_constraint (
-                $full_stars,
-                join ("" => map {gref ($x, $_)} 0 .. $y) . $up_to_full_stars,
-            );
-
-            #
-            # No more than $nr_of_stars in a column
-            #
-            $self -> __add_constraint (
-                $full_stars,
-                join ("" => map {gref ($_, $y)} 0 .. $x) . $up_to_full_stars,
-            );
-
-            #
-            # Constraint for the right number of stars in a row
-            #
-            if ($y == $Y - 1) {
-                $self -> __add_constraint (
-                    $full_stars,
-                    join ("" => map {gref ($x, $_)} 0 .. $Y - 1),
-                );
-            }
-
-            #
-            # Constraint for the right number of stars in a column
-            #
-            if ($x == $X - 1) {
-                $self -> __add_constraint (
-                    $full_stars,
-                    join ("" => map {gref ($_, $y)} 0 .. $X - 1),
-                );
-            }
-
+            $self -> __add_line_constraints ($x, $y);
         }
     }
 
