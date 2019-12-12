@@ -15,7 +15,7 @@ use List::Util            qw [min max];
 
 fieldhash my %subject;
 fieldhash my %pattern;
-fieldhash my %boxes;
+fieldhash my %houses;
 fieldhash my %X;
 fieldhash my %Y;
 fieldhash my %nr_of_stars;
@@ -50,7 +50,7 @@ sub set_houses ($self, $houses) {
         
         foreach my $y (keys @chars) {
             my $house = $chars [$y];
-            push @{$boxes {$self} {$house}} => [$x, $y];
+            push @{$houses {$self} {$house}} => [$x, $y];
         }
     }
 
