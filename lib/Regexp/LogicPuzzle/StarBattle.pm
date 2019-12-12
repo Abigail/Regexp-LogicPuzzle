@@ -24,10 +24,9 @@ fieldhash my %nr_of_stars;
 sub new  ($class) {bless \do {my $var} => $class}
 
 sub init ($self) {
-    $nr_of_stars {$self} = 1;
     $subject     {$self} = "";
     $pattern     {$self} = "";
-    $self;
+    $self -> set_nr_of_stars (1);
 }
 
 #
@@ -67,6 +66,10 @@ sub set_houses ($self, $houses) {
 sub set_nr_of_stars ($self, $stars) {
     $nr_of_stars {$self} = $stars;
     $self;
+}
+
+sub nr_of_stars ($self) {
+    $nr_of_stars {$self};
 }
 
 #
@@ -111,7 +114,7 @@ sub __add_constraint ($self, $sub_subject, $sub_pattern, %args) {
 sub __add_line_constraints ($self, $x, $y) {
     my $X            = $self -> X;
     my $Y            = $self -> Y;
-    my $nr_of_stars  = $nr_of_stars {$self};
+    my $nr_of_stars  = $self -> nr_of_stars;
 
     my $min_y_stars  = max (0, $nr_of_stars - int (($Y - $y) / 2));
     my $max_y_stars  = min (1 + int ($y / 2), $nr_of_stars);
@@ -136,7 +139,7 @@ sub __add_line_constraints ($self, $x, $y) {
 
 
 sub __add_house_constraint ($self, $x, $y) {
-    my $nr_of_stars             = $nr_of_stars {$self};
+    my $nr_of_stars             = $self -> nr_of_stars;
     my ($house_name, $position) = @{$in_house {$self} [$x] [$y]};
     my  $house                  = $houses {$self} {$house_name};
 
@@ -161,7 +164,7 @@ sub __add_house_constraint ($self, $x, $y) {
 sub build ($self) {
     my $subject          = "";
     my $pattern          = "";
-    my $nr_of_stars      = $nr_of_stars {$self};
+    my $nr_of_stars      = $self -> nr_of_stars;
     my $full_stars       = "*"  x $nr_of_stars;
 
     my $X = $self -> X;
