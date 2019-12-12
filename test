@@ -47,6 +47,38 @@ run_test <<~ '--', 1;
     DDDEE
     --
 
+#
+#   Solution:
+#
+#   ...*.
+#   *....
+#   ..*..
+#   ....*
+#   .*...
+#
+
+run_test <<~ '--', 1;
+    AAAAA
+    BAAAA
+    BCCCC
+    BBCCD
+    BEEDD
+    --
+
+
+run_test <<~ '--', 2 if 1;
+    ABBBBBBBBB
+    ABBBBCBBBD
+    AACCCCCDBD
+    EACCFGCDDD
+    EAAAFGGDDD
+    EEAFFGGGHH
+    EEAFGGHHHH
+    EEAFGGIIJJ
+    EEAFIIIIJJ
+    EEAAIIIIJJ
+    --
+
 run_test <<~ '--', 2 if 1;
     AAAAAAAAAA
     AABAAAAACA
