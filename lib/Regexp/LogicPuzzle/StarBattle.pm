@@ -16,6 +16,7 @@ use List::Util            qw [min max];
 fieldhash my %subject;
 fieldhash my %pattern;
 fieldhash my %houses;
+fieldhash my %in_house;
 fieldhash my %X;
 fieldhash my %Y;
 fieldhash my %nr_of_stars;
@@ -51,6 +52,11 @@ sub set_houses ($self, $houses) {
         foreach my $y (keys @chars) {
             my $house = $chars [$y];
             push @{$houses {$self} {$house}} => [$x, $y];
+            #
+            # For each cell, store the house it is in, an in which position.
+            #
+            $in_house {$self} [$x] [$y] =
+                      [$house => @{$houses {$self} {$house}} - 1];
         }
     }
 
